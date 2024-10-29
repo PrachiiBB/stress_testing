@@ -121,7 +121,7 @@ def main():
         print("3. Network Stress Testing")
         print("4. CPU Stress Testing")
         print("5. MySQL Stress Testing")
-        print("6. Exit")
+        print("6. Exited")
 
         choice = input("Enter your choice: ")
 
