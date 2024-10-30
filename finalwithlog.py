@@ -3,13 +3,23 @@ import psutil
 import time
 import requests
 import multiprocessing
+import mysql.connector
 import logging
+import threading
 
 # Set up logging
 logging.basicConfig(filename='stress_test.log', level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
 THRESHOLD = 80  # Percentage threshold for resource usage
+
+# MySQL database connection details
+MYSQL_CONFIG = {
+    'user': 'exporter',  # replace with your MySQL username
+    'password': 'password',  # replace with your MySQL password
+    'host': 'localhost',  # or your MySQL server IP
+    'database': 'newdb'  # replace with your test database
+}
 
 # Stress increase functions
 def increase_memory_stress():
@@ -49,6 +59,87 @@ def increase_cpu_stress():
         logging.info(f"CPU Usage: {psutil.cpu_percent(interval=1)}%")  # Log usage while stressing
         p.terminate()
     logging.info("CPU stress test completed.")
+
+def execute_stress_queries():
+    try:
+        # Establish MySQL connection
+        db_connection = mysql.connector.connect(
+            host="localhost",
+            user="exporter",
+            password="password",
+            database="newdb"
+        )
+
+        cursor = db_connection.cursor()
+
+        # Run a high volume of complex queries
+        for _ in range(10000):  # Increase the number of iterations significantly
+            # This query does a join with itself which is CPU intensive
+            cursor.execute("""
+            SELECT a.id, b.value
+            FROM sbtest1 a
+            JOIN sbtest1 b ON a.id = b.id;
+            """)
+            cursor.fetchall()  # Clear the result to avoid "Unread result" error
+
+    except mysql.connector.Error as e:
+        logging.error(f"MySQL Error: {e}")
+    finally:
+        # Close the cursor and database connection
+        if 'cursor' in locals():
+            cursor.close()
+        db_connection.close()
+
+def increase_mysql_stress():
+    try:
+        # Establish MySQL connection
+        db_connection = mysql.connector.connect(
+            host="localhost",
+            user="exporter",
+            password="password",
+            database="newdb"
+        )
+
+        cursor = db_connection.cursor()
+
+        # Create the table if it doesn't exist
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS sbtest1 (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            value VARCHAR(255)
+        );
+        """)
+
+        # Insert sample values if the table is empty
+        cursor.execute("SELECT COUNT(*) FROM sbtest1;")
+        count = cursor.fetchone()[0]
+        if count == 0:
+            for i in range(100000):  # Increase number of records significantly
+                cursor.execute("INSERT INTO sbtest1 (value) VALUES (%s);", (f'value_{i}',))
+            db_connection.commit()  # Commit the inserts
+
+        # Create multiple threads to run the stress queries concurrently
+        threads = []
+        for _ in range(5):  # Number of threads
+            thread = threading.Thread(target=execute_stress_queries)
+            threads.append(thread)
+            thread.start()
+
+        # Wait for all threads to complete
+        for thread in threads:
+            thread.join()
+
+        logging.info("MySQL stress test executed successfully.")
+
+    except mysql.connector.Error as e:
+        logging.error(f"MySQL Error: {e}")
+    finally:
+        # Cleanup: Drop the table
+        if 'cursor' in locals():
+            cursor.execute("DROP TABLE IF EXISTS sbtest1;")
+            cursor.close()
+        # Close the database connection
+        db_connection.close()
 
 # Monitoring functions
 def memory_stress_test():
@@ -110,6 +201,9 @@ def mysql_stress_test():
             else:
                 logging.info("CPU usage is within limits.")
 
+        # Now stress MySQL
+        increase_mysql_stress()
+
     except requests.RequestException as e:
         logging.error(f"Failed to retrieve metrics from mysqld_exporter: {e}")
 
@@ -121,7 +215,7 @@ def main():
         print("3. Network Stress Testing")
         print("4. CPU Stress Testing")
         print("5. MySQL Stress Testing")
-        print("6. Exited")
+        print("6. Exit")
 
         choice = input("Enter your choice: ")
 
