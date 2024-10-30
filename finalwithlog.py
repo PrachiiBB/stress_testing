@@ -231,7 +231,7 @@ def main():
             mysql_stress_test()
         elif choice == '6':
             logging.info("Exiting")
-            print("Exiting")
+            print("Exit")
             break
         else:
             logging.warning("Invalid option selected.")
