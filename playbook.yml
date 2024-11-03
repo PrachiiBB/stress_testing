@@ -3,16 +3,6 @@
   hosts: all
   become: yes
   tasks:
-    - name: Install necessary packages
-      apt:
-        name:
-          - curl
-          - wget
-          - unzip
-          - software-properties-common
-        state: present
-      when: ansible_os_family == "Debian"
-
     - name: Install necessary packages for RHEL/CentOS
       yum:
         name:
