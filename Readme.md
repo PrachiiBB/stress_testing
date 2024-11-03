@@ -12,7 +12,7 @@ Create and configure these virtual machines:
 Ensure you use a compatible Linux distribution, like **Ubuntu** or **CentOS**.
 
 ## 2. Python Script for Stress Testing 🐍📋
-Develop a **menu-based Python script** (`stress_test.yml`) with the following options:
+Develop a **menu-based Python script** (`stress_test.py`) with the following options:
 - **Option 1**: 🧠 **Memory Stress Testing**
 - **Option 2**: 💽 **Disk Stress Testing**
 - **Option 3**: 🌐 **Network Stress Testing**
