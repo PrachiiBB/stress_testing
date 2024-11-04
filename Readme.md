@@ -1,7 +1,7 @@
 # Project README: 🚀 Stress Testing and Monitoring Environment 📊💻
 
 ## Project Overview 🌟
-Welcome to a comprehensive stress testing and monitoring setup! This project equips you with everything you need for **stress testing**, **monitoring**, and **analysis** using virtual machines, Prometheus, Grafana, MySQL, and Python tools. With automation via **Ansible**, containerization with **Docker**, and deployment on **Kubernetes**, your stress-testing experience will be seamless and monitored with real-time alerts. ⚙️📈
+Welcome to a comprehensive stress testing and monitoring setup! This project equips you with everything you need for **stress testing**, **monitoring**, and **analysis** using virtual machines, Prometheus, Grafana, MySQL, and Python tools. With automation via **Ansible**, containerization with **Docker**, and deployment on **Kubernetes**, your stress-testing experience will be seamless and monitored with real-time alerts. 
 
 ## 1. Virtual Machine Setup 🖥️💡
 Create and configure these virtual machines:
